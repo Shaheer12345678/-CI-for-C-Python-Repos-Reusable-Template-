@@ -17,4 +17,8 @@ jobs:
         run: |
           black --check .
           ruff check .
-      - name: Test
+      - name: Test
+        run: |
+          coverage run -m pytest -q
+          coverage report -m
+
