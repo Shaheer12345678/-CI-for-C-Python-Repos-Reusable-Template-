@@ -1,0 +1,37 @@
+# C build artifacts
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.dylib
+*.exe
+*.out
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python envs
+.venv/
+venv/
+env/
+
+# Python packaging
+dist/
+build/
+*.egg-info/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
