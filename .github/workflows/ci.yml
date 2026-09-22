@@ -1,0 +1,14 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  cpp:
+    uses: ./.github/workflows/cpp.yml
+    with:
+      working-directory: examples/cpp
+
+  python:
+    uses: ./.github/workflows/python.yml
+    with:
+      working-directory: examples/python
