@@ -1,14 +1,58 @@
 name: C++ CI
-on: [push, pull_request]
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: Directory containing the CMake project to build.
+        type: string
+        required: false
+        default: "."
+      build-type:
+        description: Value passed to CMAKE_BUILD_TYPE.
+        type: string
+        required: false
+        default: Release
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
     steps:
       - uses: actions/checkout@v4
-      - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release || true
-      - name: Build
-        run: cmake --build build -j || true
-      - name: Test
-        run: ctest --test-dir build --output-on-failure || true
 
+      - name: Install ccache
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ccache
+
+      - name: Restore ccache directory
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.ccache
+          key: ccache-${{ runner.os }}-${{ inputs.build-type }}-${{ hashFiles(format('{0}/**/CMakeLists.txt', inputs.working-directory), format('{0}/**/*.cmake', inputs.working-directory)) }}
+          restore-keys: |
+            ccache-${{ runner.os }}-${{ inputs.build-type }}-
+            ccache-${{ runner.os }}-
+
+      - name: Reset ccache statistics
+        run: ccache --zero-stats
+
+      - name: Configure
+        run: >
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=${{ inputs.build-type }}
+          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: Build
+        run: cmake --build build -j
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Report ccache statistics
+        run: ccache --show-stats
