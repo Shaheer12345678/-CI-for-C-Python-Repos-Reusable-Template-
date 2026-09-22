@@ -35,3 +35,11 @@ build/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Coverage output
+.coverage
+.coverage.*
+htmlcov/
+
+# ccache directory used by CI
+.ccache/
